@@ -1,178 +1,65 @@
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
 
-const buildQuery = (params = {}) => {
-  const searchParams = new URLSearchParams();
-
-  Object.entries(params).forEach(([key, value]) => {
-    if (value === undefined || value === null || value === '' || value === false) {
-      return;
-    }
-
-    searchParams.set(key, String(value));
-  });
-
-  const query = searchParams.toString();
-  return query ? `?${query}` : '';
-};
-
 const request = async (path, options = {}) => {
-  const isFormData = typeof FormData !== 'undefined' && options.body instanceof FormData;
-
+  const isFormData = options.body instanceof FormData;
   const response = await fetch(`${API_URL}${path}`, {
     credentials: 'include',
-    headers: isFormData
-      ? { ...(options.headers || {}) }
-      : {
-          'Content-Type': 'application/json',
-          ...(options.headers || {})
-        },
+    headers: isFormData ? {} : { 'Content-Type': 'application/json', ...(options.headers || {}) },
     ...options
   });
-
-  const contentType = response.headers.get('content-type') || '';
-  const data = contentType.includes('application/json') ? await response.json() : null;
-
+  const ct = response.headers.get('content-type') || '';
+  const data = ct.includes('application/json') ? await response.json() : null;
   if (!response.ok) {
-    const error = new Error(data?.message || 'Сұрау орындалмады');
-    error.status = response.status;
-    error.payload = data;
-    throw error;
+    const err = new Error(data?.message || 'Сұрау орындалмады');
+    err.status = response.status;
+    throw err;
   }
-
   return data;
 };
 
 export const authApi = {
-  register: (payload) =>
-    request('/auth/register', {
-      method: 'POST',
-      body: JSON.stringify(payload)
-    }),
-  login: (payload) =>
-    request('/auth/login', {
-      method: 'POST',
-      body: JSON.stringify(payload)
-    }),
-  logout: () =>
-    request('/auth/logout', {
-      method: 'POST'
-    }),
-  forgotPassword: (payload) =>
-    request('/auth/forgot-password', {
-      method: 'POST',
-      body: JSON.stringify(payload)
-    }),
-  resetPassword: (payload) =>
-    request('/auth/reset-password', {
-      method: 'POST',
-      body: JSON.stringify(payload)
-    }),
+  register: (p) => request('/auth/register', { method: 'POST', body: JSON.stringify(p) }),
+  login: (p) => request('/auth/login', { method: 'POST', body: JSON.stringify(p) }),
+  logout: () => request('/auth/logout', { method: 'POST' }),
   me: () => request('/auth/me')
 };
 
-export const userApi = {
-  getProfile: () => request('/users/profile'),
-  updateProfile: (payload) =>
-    request('/users/profile', {
-      method: 'PATCH',
-      body: JSON.stringify(payload)
-    })
+export const dashboardApi = {
+  stats: () => request('/dashboard/stats')
 };
 
-export const propertyApi = {
-  list: (params) => request(`/properties${buildQuery(params)}`),
-  mine: () => request('/properties/mine'),
-  getById: (id) => request(`/properties/${id}`),
-  create: (payload) =>
-    request('/properties', {
-      method: 'POST',
-      body: JSON.stringify(payload)
-    }),
-  update: (id, payload) =>
-    request(`/properties/${id}`, {
-      method: 'PATCH',
-      body: JSON.stringify(payload)
-    }),
-  remove: (id) =>
-    request(`/properties/${id}`, {
-      method: 'DELETE'
-    })
+export const materialsApi = {
+  list: (params = {}) => {
+    const q = new URLSearchParams(Object.fromEntries(Object.entries(params).filter(([,v]) => v !== '' && v !== null && v !== undefined)));
+    return request(`/materials${q.toString() ? '?' + q : ''}`);
+  },
+  create: (p) => request('/materials', { method: 'POST', body: JSON.stringify(p) }),
+  update: (id, p) => request(`/materials/${id}`, { method: 'PUT', body: JSON.stringify(p) })
 };
 
-export const uploadApi = {
-  uploadPropertyImages: (formData) =>
-    request('/uploads/properties', {
-      method: 'POST',
-      body: formData
-    })
+export const inventoryApi = {
+  list: () => request('/inventory'),
+  addTransaction: (p) => request('/inventory', { method: 'POST', body: JSON.stringify(p) })
 };
 
-export const bookingApi = {
-  create: (payload) =>
-    request('/bookings', {
-      method: 'POST',
-      body: JSON.stringify(payload)
-    }),
-  listMine: () => request('/bookings/me'),
-  listHost: () => request('/bookings/host'),
-  updateManagedStatus: (id, payload) =>
-    request(`/bookings/${id}/status`, {
-      method: 'PATCH',
-      body: JSON.stringify(payload)
-    }),
-  cancel: (id) =>
-    request(`/bookings/${id}/cancel`, {
-      method: 'PATCH'
-    })
+export const requestsApi = {
+  list: (params = {}) => {
+    const q = new URLSearchParams(Object.fromEntries(Object.entries(params).filter(([,v]) => v !== '' && v !== null)));
+    return request(`/requests${q.toString() ? '?' + q : ''}`);
+  },
+  getById: (id) => request(`/requests/${id}`),
+  create: (p) => request('/requests', { method: 'POST', body: JSON.stringify(p) }),
+  updateStatus: (id, status) => request(`/requests/${id}/status`, { method: 'PATCH', body: JSON.stringify({ status }) }),
+  issue: (id) => request(`/requests/${id}/issue`, { method: 'POST' }),
+  confirm: (id) => request(`/requests/${id}/confirm`, { method: 'POST' })
 };
 
-export const favoriteApi = {
-  list: () => request('/favorites'),
-  add: (propertyId) =>
-    request(`/favorites/${propertyId}`, {
-      method: 'POST'
-    }),
-  remove: (propertyId) =>
-    request(`/favorites/${propertyId}`, {
-      method: 'DELETE'
-    })
+export const projectsApi = {
+  list: () => request('/projects'),
+  create: (p) => request('/projects', { method: 'POST', body: JSON.stringify(p) })
 };
 
-export const reviewApi = {
-  list: (propertyId) => request(`/reviews/property/${propertyId}`),
-  upsert: (propertyId, payload) =>
-    request(`/reviews/property/${propertyId}`, {
-      method: 'POST',
-      body: JSON.stringify(payload)
-    })
-};
-
-export const adminApi = {
-  summary: () => request('/admin/summary'),
-  users: () => request('/admin/users'),
-  properties: (params) => request(`/admin/properties${buildQuery(params)}`),
-  bookings: (params) => request(`/admin/bookings${buildQuery(params)}`),
-  updateBookingStatus: (id, payload) =>
-    request(`/admin/bookings/${id}`, {
-      method: 'PATCH',
-      body: JSON.stringify(payload)
-    })
-};
-
-export const chatApi = {
-  conversations: () => request('/chat/conversations'),
-  messages: (bookingId) => request(`/chat/bookings/${bookingId}`),
-  send: (bookingId, payload) =>
-    request(`/chat/bookings/${bookingId}`, {
-      method: 'POST',
-      body: JSON.stringify(payload)
-    })
-};
-
-export const assistantApi = {
-  chat: (payload) =>
-    request('/assistant/chat', {
-      method: 'POST',
-      body: JSON.stringify(payload)
-    })
+export const usersApi = {
+  list: () => request('/users'),
+  approve: (id) => request(`/users/${id}/approve`, { method: 'PATCH' })
 };

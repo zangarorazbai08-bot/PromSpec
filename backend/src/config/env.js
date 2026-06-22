@@ -46,14 +46,21 @@ const env = {
     pass: process.env.SMTP_PASS || ''
   },
   admin: {
-    name: process.env.ADMIN_NAME || 'Portal Admin',
-    email: process.env.ADMIN_EMAIL || 'admin@staynest.local',
+    name: process.env.ADMIN_NAME || 'Admin',
+    email: process.env.ADMIN_EMAIL || 'admin@promspec.local',
     password: process.env.ADMIN_PASSWORD || 'Admin12345'
   },
-  upload: {
-    maxImageSizeMb: Number(process.env.UPLOAD_MAX_IMAGE_SIZE_MB) || 5,
-    maxImageCount: Number(process.env.UPLOAD_MAX_IMAGE_COUNT) || 10
-  }
+  director: {
+    name: process.env.DIRECTOR_NAME || 'Бас Директор',
+    email: process.env.DIRECTOR_EMAIL || 'director@promspec.local',
+    password: process.env.DIRECTOR_PASSWORD || 'password123'
+  },
+  jwt: {
+    secret: process.env.JWT_SECRET || 'replace-this-secret',
+    expiresIn: process.env.JWT_EXPIRES_IN || '7d',
+    cookieName: process.env.COOKIE_NAME || 'staynest_token'
+  },
+  isProduction: (process.env.NODE_ENV || 'development') === 'production'
 };
 
 export default env;

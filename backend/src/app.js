@@ -4,16 +4,12 @@ import cookieParser from 'cookie-parser';
 import env from './config/env.js';
 import authRoutes from './routes/authRoutes.js';
 import userRoutes from './routes/userRoutes.js';
-import propertyRoutes from './routes/propertyRoutes.js';
-import bookingRoutes from './routes/bookingRoutes.js';
-import favoriteRoutes from './routes/favoriteRoutes.js';
-import reviewRoutes from './routes/reviewRoutes.js';
-import adminRoutes from './routes/adminRoutes.js';
-import chatRoutes from './routes/chatRoutes.js';
-import assistantRoutes from './routes/assistantRoutes.js';
-import uploadRoutes from './routes/uploadRoutes.js';
+import materialRoutes from './routes/materialRoutes.js';
+import projectRoutes from './routes/projectRoutes.js';
+import inventoryRoutes from './routes/inventoryRoutes.js';
+import requestRoutes from './routes/requestRoutes.js';
 import { errorHandler, notFound } from './middlewares/errorMiddleware.js';
-import { uploadsRoot } from './utils/paths.js';
+import statsRoutes from './routes/statsRoutes.js';
 
 const app = express();
 
@@ -25,33 +21,29 @@ app.use(
         callback(null, true);
         return;
       }
-
       callback(new Error('CORS рұқсат етілмеді'));
     },
     credentials: true
   })
 );
-app.use(express.json({ limit: '2mb' }));
+app.use(express.json({ limit: '5mb' }));
 app.use(cookieParser());
-app.use('/uploads', express.static(uploadsRoot));
 
 app.get('/api/health', (req, res) => {
   res.json({
     status: 'ok',
-    app: env.appName
+    app: 'Prom Spec Stroy ERP'
   });
 });
 
 app.use('/api/auth', authRoutes);
 app.use('/api/users', userRoutes);
-app.use('/api/properties', propertyRoutes);
-app.use('/api/bookings', bookingRoutes);
-app.use('/api/favorites', favoriteRoutes);
-app.use('/api/reviews', reviewRoutes);
-app.use('/api/admin', adminRoutes);
-app.use('/api/chat', chatRoutes);
-app.use('/api/assistant', assistantRoutes);
-app.use('/api/uploads', uploadRoutes);
+app.use('/api/materials', materialRoutes);
+app.use('/api/projects', projectRoutes);
+app.use('/api/inventory', inventoryRoutes);
+app.use('/api/requests', requestRoutes);
+app.use('/api/dashboard', statsRoutes);
+
 app.use(notFound);
 app.use(errorHandler);
 

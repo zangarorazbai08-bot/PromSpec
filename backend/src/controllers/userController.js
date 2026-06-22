@@ -1,11 +1,19 @@
-import * as userService from '../services/userService.js';
+import { userService } from '../services/userService.js';
 
-export const getProfile = async (req, res) => {
-  const user = await userService.getProfile(req.user.id);
-  res.json({ user });
+export const getUsers = async (req, res, next) => {
+  try {
+    const users = await userService.getUsers();
+    res.json({ users });
+  } catch (error) {
+    next(error);
+  }
 };
 
-export const updateProfile = async (req, res) => {
-  const user = await userService.updateProfile(req.user.id, req.body);
-  res.json({ user, message: 'Профиль жаңартылды' });
+export const approveUser = async (req, res, next) => {
+  try {
+    const user = await userService.approveUser(req.params.id);
+    res.json({ user });
+  } catch (error) {
+    next(error);
+  }
 };

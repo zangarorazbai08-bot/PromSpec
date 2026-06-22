@@ -1,4 +1,4 @@
-﻿export const roleLabels = {
+﻿ export const roleLabels = {
   admin: 'Әкімші',
   user: 'Пайдаланушы'
 };

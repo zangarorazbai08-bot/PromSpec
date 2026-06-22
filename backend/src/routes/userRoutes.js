@@ -1,11 +1,12 @@
-import { Router } from 'express';
-import asyncHandler from '../utils/asyncHandler.js';
-import { requireAuth } from '../middlewares/authMiddleware.js';
+import express from 'express';
 import * as userController from '../controllers/userController.js';
+import { protect, authorize } from '../middlewares/authMiddleware.js';
 
-const router = Router();
+const router = express.Router();
+router.use(protect);
 
-router.get('/profile', requireAuth, asyncHandler(userController.getProfile));
-router.patch('/profile', requireAuth, asyncHandler(userController.updateProfile));
+// Only ADMIN can see all users and approve them
+router.get('/', authorize('admin', 'director'), userController.getUsers);
+router.patch('/:id/approve', authorize('admin'), userController.approveUser);
 
 export default router;
