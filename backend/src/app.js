@@ -44,6 +44,7 @@ app.use('/api/inventory', inventoryRoutes);
 app.use('/api/requests', requestRoutes);
 app.use('/api/dashboard', statsRoutes);
 
+
 app.use(notFound);
 app.use(errorHandler);
 

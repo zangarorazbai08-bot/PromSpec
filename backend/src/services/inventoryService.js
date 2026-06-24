@@ -74,5 +74,65 @@ export const inventoryService = {
     } finally {
       client.release();
     }
+  },
+
+  async addScannedProduct(data, userId) {
+    const { name, category, color, unit, quantity, notes } = data;
+    const client = await pool.connect();
+    try {
+      await client.query('BEGIN');
+      
+      // 1. Search for existing material (case-insensitive)
+      const findRes = await client.query(
+        'SELECT * FROM materials WHERE LOWER(name) = LOWER($1)',
+        [name.trim()]
+      );
+      
+      let materialId;
+      if (findRes.rows.length > 0) {
+        materialId = findRes.rows[0].id;
+      } else {
+        // Create new material
+        const createRes = await client.query(
+          `
+            INSERT INTO materials (name, category, color, unit, current_quantity, min_quantity)
+            VALUES ($1, $2, $3, $4, 0, 10)
+            RETURNING id
+          `,
+          [name.trim(), category, color, unit]
+        );
+        materialId = createRes.rows[0].id;
+      }
+      
+      // 2. Add inventory transaction
+      const transRes = await client.query(
+        `
+          INSERT INTO inventory_transactions 
+          (material_id, user_id, type, quantity, reference_type, notes)
+          VALUES ($1, $2, 'in', $3, 'scan', $4)
+          RETURNING *
+        `,
+        [materialId, userId, quantity, notes || 'Сканерлеу арқылы қабылданды']
+      );
+      
+      // 3. Update material quantity
+      await client.query(
+        `
+          UPDATE materials
+          SET current_quantity = current_quantity + $1,
+              updated_at = NOW()
+          WHERE id = $2
+        `,
+        [quantity, materialId]
+      );
+      
+      await client.query('COMMIT');
+      return transRes.rows[0];
+    } catch (err) {
+      await client.query('ROLLBACK');
+      throw err;
+    } finally {
+      client.release();
+    }
   }
 };

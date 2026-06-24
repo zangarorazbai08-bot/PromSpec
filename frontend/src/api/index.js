@@ -39,7 +39,9 @@ export const materialsApi = {
 
 export const inventoryApi = {
   list: () => request('/inventory'),
-  addTransaction: (p) => request('/inventory', { method: 'POST', body: JSON.stringify(p) })
+  addTransaction: (p) => request('/inventory', { method: 'POST', body: JSON.stringify(p) }),
+  scan: (image) => request('/inventory/scan', { method: 'POST', body: JSON.stringify({ image }) }),
+  addScannedProduct: (p) => request('/inventory/add-scanned', { method: 'POST', body: JSON.stringify(p) })
 };
 
 export const requestsApi = {
@@ -63,3 +65,4 @@ export const usersApi = {
   list: () => request('/users'),
   approve: (id) => request(`/users/${id}/approve`, { method: 'PATCH' })
 };
+

@@ -60,6 +60,7 @@ function Sidebar({ user, onLogout, theme, toggleTheme, collapsed, setCollapsed }
   const navItems = [
     { to: '/', label: 'Басты бет', icon: LayoutDashboard, roles: ['admin','director','supplier','storekeeper','foreman'] },
     { to: '/materials', label: 'Қойма', icon: PackageSearch, roles: ['admin','director','supplier','storekeeper','foreman'] },
+    
     { to: '/requests', label: 'Заявкалар', icon: ClipboardList, roles: ['admin','supplier','storekeeper','foreman'] },
     { to: '/users', label: 'Қызметкерлер', icon: Users, roles: ['admin'] }
   ].filter(item => item.roles.includes(user?.role));

@@ -4,7 +4,9 @@ import env from '../config/env.js';
 const config = env.databaseUrl
   ? {
       connectionString: env.databaseUrl,
-      ssl: env.db.ssl ? { rejectUnauthorized: false } : false
+      ssl: env.isProduction || env.db.ssl || env.databaseUrl.includes('neon.tech') || env.databaseUrl.includes('render.com')
+        ? { rejectUnauthorized: false }
+        : false
     }
   : {
       host: env.db.host,
@@ -12,7 +14,9 @@ const config = env.databaseUrl
       database: env.db.database,
       user: env.db.user,
       password: env.db.password,
-      ssl: env.db.ssl ? { rejectUnauthorized: false } : false
+      ssl: env.isProduction || env.db.ssl
+        ? { rejectUnauthorized: false }
+        : false
     };
 
 const pool = new Pool(config);

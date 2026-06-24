@@ -10,5 +10,7 @@ router.get('/', inventoryController.getTransactions);
 
 // Only admin, director, storekeeper can add direct inventory transactions
 router.post('/', authorize('admin', 'director', 'storekeeper'), inventoryController.addTransaction);
+router.post('/scan', authorize('admin', 'director', 'storekeeper'), inventoryController.scanImage);
+router.post('/add-scanned', authorize('admin', 'director', 'storekeeper'), inventoryController.addScannedProduct);
 
 export default router;
