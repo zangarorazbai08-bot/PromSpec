@@ -5,7 +5,7 @@
 
 [build.environment]
   NODE_VERSION = "20"
-  VITE_API_URL = "https://prom-spec-stroy-api.onrender.com/api"
+  VITE_API_URL = "https://promspec-5ydr.onrender.com/api"
 
 [[redirects]]
   from = "/*"
