@@ -11,9 +11,9 @@ export const authService = {
     }
 
     const hashed = await hashPassword(password);
-    // Admins and directors are approved automatically in demo (normally not created here),
-    // but storekeepers and foremen are false.
-    const isApproved = (role === 'admin' || role === 'director') ? true : false;
+    // Admins, directors, and clients are approved automatically,
+    // but storekeepers and foremen are false and require admin approval.
+    const isApproved = (role === 'admin' || role === 'director' || role === 'client') ? true : false;
 
     const result = await pool.query(
       `

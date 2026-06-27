@@ -44,7 +44,7 @@ const createTables = async (client) => {
       password_hash TEXT NOT NULL,
       phone VARCHAR(40),
       role VARCHAR(20) NOT NULL DEFAULT 'foreman'
-        CHECK (role IN ('admin', 'director', 'supplier', 'storekeeper', 'foreman')),
+        CHECK (role IN ('admin', 'director', 'supplier', 'storekeeper', 'foreman', 'client')),
       is_approved BOOLEAN NOT NULL DEFAULT false,
       created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
       updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
@@ -236,6 +236,12 @@ export const initializeDatabase = async () => {
 
     // CREATE tables only if they don't exist — existing data is preserved
     await createTables(client);
+
+    // Alter constraint to support client role in case table already exists
+    await client.query(`
+      ALTER TABLE users DROP CONSTRAINT IF EXISTS users_role_check;
+      ALTER TABLE users ADD CONSTRAINT users_role_check CHECK (role IN ('admin', 'director', 'supplier', 'storekeeper', 'foreman', 'client'));
+    `);
 
     // Add admin/director only if they don't exist yet
     const storekeeperId = await ensureInitialUsers(client);

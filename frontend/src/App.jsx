@@ -12,6 +12,7 @@ const MaterialsPage = lazy(() => import('./pages/MaterialsPage.jsx'));
 const RequestsPage = lazy(() => import('./pages/RequestsPage.jsx'));
 const UsersPage = lazy(() => import('./pages/UsersPage.jsx'));
 const AuthPage = lazy(() => import('./pages/AuthPage.jsx'));
+const ClientPortal = lazy(() => import('./pages/ClientPortal.jsx'));
 
 // ─── Role helpers ──────────────────────────────────────────────────────────────
 export const ROLE_LABELS = {
@@ -19,7 +20,8 @@ export const ROLE_LABELS = {
   director: 'Бас Директор',
   supplier: 'Жеткізуші',
   storekeeper: 'Қоймашы',
-  foreman: 'Жұмыс Жүргізуші'
+  foreman: 'Жұмыс Жүргізуші',
+  client: 'Қолданушы'
 };
 
 export const ROLE_COLORS = {
@@ -27,7 +29,8 @@ export const ROLE_COLORS = {
   director:    '#913831',
   supplier:    '#0369a1',
   storekeeper: '#059669',
-  foreman:     '#b45309'
+  foreman:     '#b45309',
+  client:      '#8b5cf6'
 };
 
 // ─── Toast system ──────────────────────────────────────────────────────────────
@@ -141,6 +144,16 @@ function AppShell({ theme, toggleTheme, session, setSession, notify }) {
       <Suspense fallback={<div className="page-loader">Жүктелуде...</div>}>
         <Routes>
           <Route path="*" element={<AuthPage onAuthSuccess={u => setSession({ loading: false, user: u })} notify={notify} />} />
+        </Routes>
+      </Suspense>
+    );
+  }
+
+  if (session.user.role === 'client') {
+    return (
+      <Suspense fallback={<div className="page-loader">Жүктелуде...</div>}>
+        <Routes>
+          <Route path="*" element={<ClientPortal user={session.user} onLogout={handleLogout} theme={theme} toggleTheme={toggleTheme} notify={notify} />} />
         </Routes>
       </Suspense>
     );

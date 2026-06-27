@@ -4,6 +4,7 @@ import { authApi } from '../api/index.js';
 import Logo from '../Logo.jsx';
 
 const ROLES = [
+  { value: 'client',      label: 'Қолданушы',          desc: 'Клиент — үй сатып алу / фасад тапсырысы', icon: User, color: '#8b5cf6' },
   { value: 'foreman',     label: 'Жұмыс Жүргізуші',  desc: 'Прораб — заявка береді',        icon: HardHat, color: '#b45309' },
   { value: 'storekeeper', label: 'Қоймашы',            desc: 'Складчик — тауар қабылдайды',   icon: Package, color: '#059669' },
   { value: 'supplier',    label: 'Жеткізуші',          desc: 'Снабженец — заявка өңдейді',    icon: Truck,   color: '#0369a1' },
@@ -18,7 +19,7 @@ function AuthModal({ mode, onClose, onAuthSuccess, notify }) {
   const [password, setPassword] = useState('');
   const [fullName, setFullName] = useState('');
   const [phone, setPhone] = useState('');
-  const [role, setRole] = useState('foreman');
+  const [role, setRole] = useState('client');
 
   const handleSubmit = async (e) => {
     e.preventDefault();
