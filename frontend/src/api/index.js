@@ -2,9 +2,24 @@ const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
 
 const request = async (path, options = {}) => {
   const isFormData = options.body instanceof FormData;
+  
+  // Read token from localStorage
+  const token = localStorage.getItem('pss_token');
+  
+  const headers = {};
+  if (!isFormData) {
+    headers['Content-Type'] = 'application/json';
+  }
+  if (token) {
+    headers['Authorization'] = `Bearer ${token}`;
+  }
+  if (options.headers) {
+    Object.assign(headers, options.headers);
+  }
+
   const response = await fetch(`${API_URL}${path}`, {
     credentials: 'include',
-    headers: isFormData ? {} : { 'Content-Type': 'application/json', ...(options.headers || {}) },
+    headers,
     ...options
   });
   const ct = response.headers.get('content-type') || '';
@@ -18,9 +33,24 @@ const request = async (path, options = {}) => {
 };
 
 export const authApi = {
-  register: (p) => request('/auth/register', { method: 'POST', body: JSON.stringify(p) }),
-  login: (p) => request('/auth/login', { method: 'POST', body: JSON.stringify(p) }),
-  logout: () => request('/auth/logout', { method: 'POST' }),
+  register: async (p) => {
+    const data = await request('/auth/register', { method: 'POST', body: JSON.stringify(p) });
+    if (data.token) {
+      localStorage.setItem('pss_token', data.token);
+    }
+    return data;
+  },
+  login: async (p) => {
+    const data = await request('/auth/login', { method: 'POST', body: JSON.stringify(p) });
+    if (data.token) {
+      localStorage.setItem('pss_token', data.token);
+    }
+    return data;
+  },
+  logout: async () => {
+    localStorage.removeItem('pss_token');
+    return request('/auth/logout', { method: 'POST' });
+  },
   me: () => request('/auth/me')
 };
 

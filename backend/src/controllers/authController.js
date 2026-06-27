@@ -27,7 +27,7 @@ const sendTokenResponse = (user, statusCode, res) => {
     is_approved: user.is_approved
   };
 
-  res.status(statusCode).json({ user: safeUser });
+  res.status(statusCode).json({ user: safeUser, token });
 };
 
 export const register = async (req, res, next) => {

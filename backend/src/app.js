@@ -17,7 +17,11 @@ app.set('trust proxy', 1);
 app.use(
   cors({
     origin(origin, callback) {
-      if (!origin || env.clientUrls.includes(origin)) {
+      if (
+        !origin || 
+        env.clientUrls.includes(origin) || 
+        origin.endsWith('.netlify.app')
+      ) {
         callback(null, true);
         return;
       }
