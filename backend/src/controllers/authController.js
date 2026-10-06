@@ -54,6 +54,16 @@ export const login = async (req, res, next) => {
   }
 };
 
+export const oauthMock = async (req, res, next) => {
+  try {
+    const { provider } = req.body;
+    const user = await authService.oauthMock(provider);
+    sendTokenResponse(user, 200, res);
+  } catch (error) {
+    next(error);
+  }
+};
+
 export const logout = (req, res) => {
   res.cookie(env.jwt.cookieName, 'none', {
     expires: new Date(Date.now() + 10 * 1000),

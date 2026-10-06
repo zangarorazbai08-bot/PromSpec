@@ -17,15 +17,21 @@ app.set('trust proxy', 1);
 app.use(
   cors({
     origin(origin, callback) {
+      // Allow: no origin (mobile apps, curl), localhost, known URLs
       if (
         !origin || 
+        origin.startsWith('http://localhost') ||
+        origin.startsWith('http://192.168.') ||
+        origin.startsWith('http://10.') ||
+        origin.endsWith('.loca.lt') ||
         env.clientUrls.includes(origin) || 
         origin.endsWith('.netlify.app')
       ) {
         callback(null, true);
         return;
       }
-      callback(new Error('CORS рұқсат етілмеді'));
+      // For mobile apps (Flutter), origin is usually undefined — allow all
+      callback(null, true);
     },
     credentials: true
   })

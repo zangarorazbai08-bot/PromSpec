@@ -4,7 +4,7 @@ import env from '../config/env.js';
 const config = env.databaseUrl
   ? {
       connectionString: env.databaseUrl,
-      ssl: env.isProduction || env.db.ssl || env.databaseUrl.includes('neon.tech') || env.databaseUrl.includes('render.com')
+      ssl: env.isProduction || env.db.ssl || env.databaseUrl.includes('neon.tech') || env.databaseUrl.includes('render.com') || env.databaseUrl.includes('supabase.com')
         ? { rejectUnauthorized: false }
         : false
     }
@@ -19,6 +19,7 @@ const config = env.databaseUrl
         : false
     };
 
+console.log("DB Config:", { ...config, password: "***" });
 const pool = new Pool(config);
 
 pool.on('error', (error) => {

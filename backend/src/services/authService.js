@@ -55,5 +55,43 @@ export const authService = {
     );
     if (!result.rows[0]) throw { status: 404, message: 'Пайдаланушы табылмады' };
     return result.rows[0];
+  },
+
+  async oauthMock(provider) {
+    const email = `mock_${provider}@example.com`;
+    const fullName = `${provider.charAt(0).toUpperCase() + provider.slice(1)} User`;
+    
+    try {
+      // Check if user already exists
+      let result = await pool.query('SELECT * FROM users WHERE email = $1', [email]);
+      let user = result.rows[0];
+      
+      if (!user) {
+        // Create new user instantly, auto-approved
+        const hashed = await hashPassword('OAuth_Pass_' + provider + '_123!');
+        const insertRes = await pool.query(
+          `INSERT INTO users (full_name, email, password_hash, phone, role, is_approved)
+           VALUES ($1, $2, $3, $4, $5, $6) RETURNING *`,
+          [fullName, email, hashed, '', 'client', true]
+        );
+        user = insertRes.rows[0];
+      } else if (!user.is_approved) {
+        // Make sure OAuth users are always approved
+        await pool.query('UPDATE users SET is_approved = true WHERE id = $1', [user.id]);
+        user.is_approved = true;
+      }
+      
+      return {
+        id: user.id,
+        fullName: user.full_name,
+        email: user.email,
+        role: user.role,
+        is_approved: true,
+        phone: user.phone || ''
+      };
+    } catch (err) {
+      console.error('oauthMock error:', err);
+      throw { status: 500, message: 'OAuth кіру қатесі: ' + (err.message || 'Unknown error') };
+    }
   }
 };

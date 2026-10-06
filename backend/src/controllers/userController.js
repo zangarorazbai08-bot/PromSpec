@@ -17,3 +17,22 @@ export const approveUser = async (req, res, next) => {
     next(error);
   }
 };
+
+export const updateProfile = async (req, res, next) => {
+  try {
+    const user = await userService.updateProfile(req.user.id, req.body);
+    res.json({ user });
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const updatePassword = async (req, res, next) => {
+  try {
+    const { oldPassword, newPassword } = req.body;
+    const result = await userService.updatePassword(req.user.id, oldPassword, newPassword);
+    res.json(result);
+  } catch (error) {
+    next(error);
+  }
+};

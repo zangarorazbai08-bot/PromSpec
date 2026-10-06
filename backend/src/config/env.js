@@ -29,13 +29,13 @@ const env = {
   emailFrom: process.env.EMAIL_FROM || 'StayNest <no-reply@staynest.local>',
   geminiApiKey: process.env.GEMINI_API_KEY || '',
   geminiModel: process.env.GEMINI_MODEL || 'gemini-2.5-flash',
-  databaseUrl: process.env.DATABASE_URL || '',
+  databaseUrl: '', // process.env.DATABASE_URL || '',
   db: {
     host: process.env.PGHOST || 'localhost',
     port: Number(process.env.PGPORT) || 5432,
     database: process.env.PGDATABASE || 'staynest_portal',
     user: process.env.PGUSER || 'postgres',
-    password: process.env.PGPASSWORD || 'postgres',
+    password: process.env.PGPASSWORD || '1234',
     ssl: asBoolean(process.env.DB_SSL)
   },
   smtp: {

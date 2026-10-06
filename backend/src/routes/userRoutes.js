@@ -5,6 +5,10 @@ import { protect, authorize } from '../middlewares/authMiddleware.js';
 const router = express.Router();
 router.use(protect);
 
+// Profile endpoints
+router.put('/profile', userController.updateProfile);
+router.put('/profile/password', userController.updatePassword);
+
 // Only ADMIN can see all users and approve them
 router.get('/', authorize('admin', 'director'), userController.getUsers);
 router.patch('/:id/approve', authorize('admin'), userController.approveUser);

@@ -69,6 +69,7 @@ const createTables = async (client) => {
       category VARCHAR(120),
       color VARCHAR(50),
       unit VARCHAR(50) NOT NULL,
+      unit_price NUMERIC(12, 2) DEFAULT 0,
       current_quantity NUMERIC(12, 2) NOT NULL DEFAULT 0,
       min_quantity NUMERIC(12, 2) NOT NULL DEFAULT 0,
       created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
@@ -241,6 +242,11 @@ export const initializeDatabase = async () => {
     await client.query(`
       ALTER TABLE users DROP CONSTRAINT IF EXISTS users_role_check;
       ALTER TABLE users ADD CONSTRAINT users_role_check CHECK (role IN ('admin', 'director', 'supplier', 'storekeeper', 'foreman', 'client'));
+    `);
+
+    // Add unit_price to materials if missing
+    await client.query(`
+      ALTER TABLE materials ADD COLUMN IF NOT EXISTS unit_price NUMERIC(12, 2) DEFAULT 0;
     `);
 
     // Add admin/director only if they don't exist yet
